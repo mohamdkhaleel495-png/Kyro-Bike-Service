@@ -13,7 +13,7 @@ jobs:
 
       - name: Extract Flutter project
         run: |
-          unzip -o *.zip -d project
+          unzip -o KYRO_Doorstep_Bike_Service_Complete.zip -d project
           PROJECT_DIR=$(dirname "$(find project -name pubspec.yaml -print -quit)")
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
