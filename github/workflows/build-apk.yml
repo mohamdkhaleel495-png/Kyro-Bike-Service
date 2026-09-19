@@ -22,7 +22,23 @@ jobs:
         with:
           flutter-version: stable
 
-      - name: Build APK
+            - name: Generate Android platform
+        run: |
+          cd "$PROJECT_DIR"
+          flutter create --platforms=android .
+
+      - name: Fix Android Gradle Plugin
+        run: |
+          sed -i 's/8\.7\.3/8.11.1/g' "$PROJECT_DIR/android/build.gradle"
+          sed -i 's/8\.7\.3/8.11.1/g' "$PROJECT_DIR/android/settings.gradle"
+          echo "android.newDsl=false" >> "$PROJECT_DIR/android/gradle.properties"
+          echo "android.builtInKotlin=false" >> "$PROJECT_DIR/android/gradle.properties"
+          rm -f "$PROJECT_DIR/android/app/build.gradle.kts"
+
+      - name: Get dependencies
+        run: |
+          cd "$PROJECT_DIR"
+          flutter pub get
         run: |
           cd "$PROJECT_DIR"
           flutter pub get
