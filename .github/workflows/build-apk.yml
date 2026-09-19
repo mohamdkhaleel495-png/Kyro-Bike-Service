@@ -27,10 +27,13 @@ jobs:
           cd "$PROJECT_DIR"
           flutter create --platforms=android .
 
-      - name: Fix AGP 9 compatibility
+      - name: Fix Android Gradle Plugin
         run: |
+          sed -i 's/com.android.application" version "[^"]*"/com.android.application" version "8.11.1"/' "$PROJECT_DIR/android/settings.gradle"
+          sed -i 's/com.android.application" version "[^"]*"/com.android.application" version "8.11.1"/' "$PROJECT_DIR/android/settings.gradle.kts"
           echo "android.newDsl=false" >> "$PROJECT_DIR/android/gradle.properties"
           echo "android.builtInKotlin=false" >> "$PROJECT_DIR/android/gradle.properties"
+          rm -f "$PROJECT_DIR/android/app/build.gradle.kts"
 
       - name: Get dependencies
         run: |
