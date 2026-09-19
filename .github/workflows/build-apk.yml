@@ -21,10 +21,16 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+
       - name: Generate Android platform
         run: |
           cd "$PROJECT_DIR"
           flutter create --platforms=android .
+
+      - name: Fix AGP 9 compatibility
+        run: |
+          echo "android.newDsl=false" >> "$PROJECT_DIR/android/gradle.properties"
+
       - name: Get dependencies
         run: |
           cd "$PROJECT_DIR"
