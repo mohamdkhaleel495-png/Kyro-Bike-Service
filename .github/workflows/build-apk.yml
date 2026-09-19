@@ -30,6 +30,7 @@ jobs:
       - name: Fix AGP 9 compatibility
         run: |
           echo "android.newDsl=false" >> "$PROJECT_DIR/android/gradle.properties"
+          echo "android.builtInKotlin=false" >> "$PROJECT_DIR/android/gradle.properties"
 
       - name: Get dependencies
         run: |
