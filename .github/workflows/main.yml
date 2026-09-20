@@ -16,17 +16,17 @@ jobs:
 
       - name: Extract KYRO project
         run: |
-          mkdir -p build_src
-          unzip -q KYRO_Doorstep_Bike_Service_APK_READY.zip -d build_src
+          mkdir -p source
+          unzip -q KYRO_Doorstep_Bike_Service_APK_READY.zip -d source
 
       - name: Find Flutter project
         run: |
-          PUBSPEC=$(find build_src -name pubspec.yaml -print -quit)
+          PUBSPEC=$(find source -name pubspec.yaml -print -quit)
           if [ -z "$PUBSPEC" ]; then
             echo "pubspec.yaml not found"
             exit 1
           fi
-          echo "PROJECT_DIR=$(dirname "$PUBSPEC")" >> $GITHUB_ENV
+          echo "SOURCE_DIR=$(dirname "$PUBSPEC")" >> $GITHUB_ENV
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -35,16 +35,35 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Create new Flutter Android project
+        run: |
+          flutter create --platforms android --org com.kyro kyro_app
+
+      - name: Copy KYRO app code
+        run: |
+          rm -rf kyro_app/lib
+          cp -r "$SOURCE_DIR/lib" kyro_app/lib
+
+          if [ -d "$SOURCE_DIR/assets" ]; then
+            cp -r "$SOURCE_DIR/assets" kyro_app/assets
+          fi
+
+          cp "$SOURCE_DIR/pubspec.yaml" kyro_app/pubspec.yaml
+
+      - name: Regenerate Android project
+        working-directory: kyro_app
+        run: flutter create --platforms android .
+
       - name: Get dependencies
-        working-directory: ${{ env.PROJECT_DIR }}
+        working-directory: kyro_app
         run: flutter pub get
 
       - name: Build APK
-        working-directory: ${{ env.PROJECT_DIR }}
+        working-directory: kyro_app
         run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: KYRO-APK
-          path: ${{ env.PROJECT_DIR }}/build/app/outputs/flutter-apk/app-release.apk
+          path: kyro_app/build/app/outputs/flutter-apk/app-release.apk
